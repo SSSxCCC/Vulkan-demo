@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "D:/tool/cmake-3.25.0-rc1-windows-x86_64/cmake-3.25.0-rc1-windows-x86_64/bin/cmake.exe --build '${workspaceFolder}/build' --config Debug -j8"
+        }
+    ]
+}
