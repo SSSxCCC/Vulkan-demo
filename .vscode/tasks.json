@@ -3,8 +3,22 @@
     "tasks": [
         {
             "label": "build",
+            "dependsOn": ["build exe", "build shader.vert", "build shader.frag"]
+        },
+        {
+            "label": "build exe",
             "type": "shell",
             "command": "D:/tool/cmake-3.25.0-rc1-windows-x86_64/cmake-3.25.0-rc1-windows-x86_64/bin/cmake.exe --build '${workspaceFolder}/build' --config Debug -j8"
+        },
+        {
+            "label": "build shader.vert",
+            "type": "shell",
+            "command": "&'${env:VULKAN_SDK}/Bin/glslc.exe' '${workspaceFolder}/Shader/shader.vert' -o '${workspaceFolder}/Shader/vert.spv'"
+        },
+        {
+            "label": "build shader.frag",
+            "type": "shell",
+            "command": "&'${env:VULKAN_SDK}/Bin/glslc.exe' '${workspaceFolder}/Shader/shader.frag' -o '${workspaceFolder}/Shader/frag.spv'"
         }
     ]
 }
