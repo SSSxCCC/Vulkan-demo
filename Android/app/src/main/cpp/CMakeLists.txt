@@ -27,7 +27,10 @@ add_library( # Sets the name of the library.
         Renderer.cpp
         Shader.cpp
         TextureAsset.cpp
-        Utility.cpp)
+        Utility.cpp
+        VulkanApp.cpp)
+
+set_property (TARGET vulkanapp PROPERTY CXX_STANDARD 20)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -69,4 +72,6 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib})
+        ${log-lib}
+
+        vulkan)
