@@ -4,6 +4,8 @@
 
 ## 代码运行方法
 
+### Windows程序
+
 1 安装Visual Studio 2022和VSCode
 
 2 在Visual Studio 2022中安装"Desktop development with C++"，保持默认勾选即可
@@ -17,3 +19,11 @@
 6 将.vscode目录下的所有设置文件中的绝对路径改成你自己系统的路径
 
 7 按F5即可编译运行
+
+### Android应用
+
+1 安装Android Studio和最新的Android SDK/NDK
+
+2 在Android Studio中将"Android"目录作为项目打开
+
+3 插入调试手机，点击Android Studio上方的运行按钮
