@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/Source/Debug/VulkanDemo.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "console": "externalTerminal",
             "preLaunchTask": "build"
