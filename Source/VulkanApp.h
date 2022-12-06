@@ -1,21 +1,15 @@
-//
-// Created by SxC on 12/3/2022.
-//
+#ifndef _VulkanApp_H_
+#define _VulkanApp_H_
 
-#ifndef GAME_APPLICATION_VULKANAPP_H
-#define GAME_APPLICATION_VULKANAPP_H
-
-#define VK_USE_PLATFORM_ANDROID_KHR
-#include <vulkan/vulkan.h>
+#include "Platform.h"
 #include <optional>
 #include <vector>
-
-struct android_app;
+#include <cstdint>    // Necessary for uint32_t
 
 class VulkanApp {
 public:
-    VulkanApp(android_app* pApp) : mApp(pApp) { initVulkan(); }
-    ~VulkanApp() { cleanup(); }
+    VulkanApp(Platform* platform) : mPlatform(platform) { initVulkan(); }
+    ~VulkanApp() { cleanup(); delete mPlatform; }
 
     void drawFrame();
 
@@ -24,7 +18,7 @@ public:
     }
 
 private:
-    android_app* mApp;
+    Platform* mPlatform;
 
     VkInstance mInstance;
 
@@ -120,8 +114,6 @@ private:
 
     void createGraphicsPipeline();
 
-    std::vector<char> readFile(const std::string& filename);
-
     VkShaderModule createShaderModule(const std::vector<char>& code);
 
     void createFramebuffers();
@@ -141,4 +133,4 @@ private:
     void cleanup();
 };
 
-#endif //GAME_APPLICATION_VULKANAPP_H
+#endif // _VulkanApp_H_

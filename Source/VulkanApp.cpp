@@ -1,15 +1,6 @@
-//
-// Created by SxC on 12/3/2022.
-//
-
 #include "VulkanApp.h"
-#include "AndroidOut.h"
-#include <game-activity/native_app_glue/android_native_app_glue.h>
 #include <algorithm>  // Necessary for std::clamp
-#include <cstdint>    // Necessary for uint32_t
 #include <cstdlib>
-#include <fstream>
-#include <iostream>
 #include <limits>  // Necessary for std::numeric_limits
 #include <set>
 #include <stdexcept>
@@ -91,9 +82,9 @@ void VulkanApp::createInstance() {
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
         std::vector<VkExtensionProperties> extensions(extensionCount);
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-        aout << "available extensions:\n";
+        mPlatform->mOut << "available extensions:\n";
         for (const auto &extension: extensions) {
-            aout << '\t' << extension.extensionName << '\n';
+            mPlatform->mOut << '\t' << extension.extensionName << std::endl;
         }
     }
 
@@ -107,12 +98,7 @@ void VulkanApp::createInstance() {
     VkInstanceCreateInfo createInfo { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
     createInfo.pApplicationInfo = &appInfo;
 
-    //uint32_t glfwExtensionCount = 0;
-    //const char** glfwExtensions;
-    //glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-    std::vector<const char *> extensions;
-    extensions.push_back("VK_KHR_surface");
-    extensions.push_back("VK_KHR_android_surface");
+    std::vector<const char *> extensions = mPlatform->getExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -150,11 +136,7 @@ bool VulkanApp::checkValidationLayerSupport() {
 }
 
 void VulkanApp::createSurface() {
-    VkAndroidSurfaceCreateInfoKHR createInfo { VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR };
-    createInfo.window = mApp->window;
-    if (vkCreateAndroidSurfaceKHR(mInstance, &createInfo, nullptr, &mSurface) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create window surface!");
-    }
+    mPlatform->createSurface(mInstance, mSurface);
 }
 
 void VulkanApp::pickPhysicalDevice() {
@@ -167,13 +149,10 @@ void VulkanApp::pickPhysicalDevice() {
     vkEnumeratePhysicalDevices(mInstance, &deviceCount, devices.data());
 
     for (const auto& device : devices) {
-        VkPhysicalDeviceProperties deviceProperties;
-        vkGetPhysicalDeviceProperties(device, &deviceProperties);
-        aout << "Vulkan physical device: " << deviceProperties.deviceName << std::endl;
         if (isDeviceSuitable(device)) {
-            //VkPhysicalDeviceProperties deviceProperties;
-            //vkGetPhysicalDeviceProperties(device, &deviceProperties);
-            std::cout << "Vulkan physical device: " << deviceProperties.deviceName << std::endl;
+            VkPhysicalDeviceProperties deviceProperties;
+            vkGetPhysicalDeviceProperties(device, &deviceProperties);
+            mPlatform->mOut << "Vulkan physical device: " << deviceProperties.deviceName << std::endl;
             mPhysicalDevice = device;
             break;
         }
@@ -376,8 +355,8 @@ VkExtent2D VulkanApp::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilit
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
         return capabilities.currentExtent;
     } else {
-        auto width = ANativeWindow_getWidth(mApp->window);
-        auto height = ANativeWindow_getHeight(mApp->window);
+        int width, height;
+        mPlatform->getSurfaceSize(width, height);
         VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
         actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
         actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
@@ -449,8 +428,8 @@ void VulkanApp::createRenderPass() {
 }
 
 void VulkanApp::createGraphicsPipeline() {
-    auto vertShaderCode = readFile("Shader/vert.spv");
-    auto fragShaderCode = readFile("Shader/frag.spv");
+    auto vertShaderCode = mPlatform->readFile("Shader/vert.spv");
+    auto fragShaderCode = mPlatform->readFile("Shader/frag.spv");
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
 
@@ -581,35 +560,6 @@ void VulkanApp::createGraphicsPipeline() {
     vkDestroyShaderModule(mDevice, vertShaderModule, nullptr);
 }
 
-std::vector<char> VulkanApp::readFile(const std::string& filename) {
-    /*std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-    if (!file.is_open()) {
-        throw std::runtime_error("failed to open file!");
-    }
-
-    size_t fileSize = (size_t)file.tellg();
-    std::vector<char> buffer(fileSize);
-    file.seekg(0);
-    file.read(buffer.data(), fileSize);
-    file.close();
-
-    return buffer;*/
-
-    AAsset* file = AAssetManager_open(mApp->activity->assetManager, filename.c_str(), AASSET_MODE_BUFFER);
-
-    if (!file) {
-        throw std::runtime_error("failed to open file!");
-    }
-
-    size_t fileSize = AAsset_getLength(file);
-    std::vector<char> buffer(fileSize);
-    AAsset_read(file, buffer.data(), fileSize);
-    AAsset_close(file);
-
-    return buffer;
-}
-
 VkShaderModule VulkanApp::createShaderModule(const std::vector<char>& code) {
     VkShaderModuleCreateInfo createInfo { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
     createInfo.codeSize = code.size();
@@ -684,14 +634,7 @@ void VulkanApp::createSyncObjects() {
 }
 
 void VulkanApp::recreateSwapChain() {
-    //int width = 0, height = 0;
-    //width = ANativeWindow_getWidth(mApp->window);
-    //height = ANativeWindow_getHeight(mApp->window);
-    //while (width == 0 || height == 0) {
-    //    width = ANativeWindow_getWidth(mApp->window);
-    //    height = ANativeWindow_getHeight(mApp->window);
-    //    glfwWaitEvents();
-    //}
+    mPlatform->waitSurfaceSize();
 
     vkDeviceWaitIdle(mDevice);
 

@@ -28,7 +28,10 @@ add_library( # Sets the name of the library.
         Shader.cpp
         TextureAsset.cpp
         Utility.cpp
-        VulkanApp.cpp)
+        ../../../../../Source/VulkanApp.cpp
+        ../../../../../Source/Platform.cpp)
+
+target_include_directories (vulkanapp PUBLIC ../../../../../Source)
 
 set_property (TARGET vulkanapp PROPERTY CXX_STANDARD 20)
 

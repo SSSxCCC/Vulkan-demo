@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.12)
 
-add_executable (VulkanDemo "main.cpp")
+add_executable (VulkanDemo "main.cpp" "Platform.cpp" "VulkanApp.cpp")
 target_include_directories (VulkanDemo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 set_property (TARGET VulkanDemo PROPERTY CXX_STANDARD 20)
