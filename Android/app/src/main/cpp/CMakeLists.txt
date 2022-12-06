@@ -24,10 +24,7 @@ add_library( # Sets the name of the library.
         main.cpp
 
         AndroidOut.cpp
-        Renderer.cpp
-        Shader.cpp
-        TextureAsset.cpp
-        Utility.cpp
+
         ../../../../../Source/VulkanApp.cpp
         ../../../../../Source/Platform.cpp)
 
