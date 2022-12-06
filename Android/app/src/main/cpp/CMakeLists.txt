@@ -53,6 +53,8 @@ find_package(game-activity REQUIRED CONFIG)
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
+add_subdirectory ("../../../../../Dependency/glm" "glm")
+
 target_link_libraries( # Specifies the target library.
         vulkanapp
 
@@ -74,4 +76,5 @@ target_link_libraries( # Specifies the target library.
         # included in the NDK.
         ${log-lib}
 
-        vulkan)
+        vulkan
+        glm)
