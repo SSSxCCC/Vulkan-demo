@@ -70,6 +70,7 @@ void VulkanApp::initVulkan() {
     createCommandPool();
     createCommandBuffers();
     createVertexBuffer();
+    createIndexBuffer();
     createSyncObjects();
 }
 
@@ -690,6 +691,24 @@ void VulkanApp::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize 
     vkFreeCommandBuffers(mDevice, mCommandPool, 1, &commandBuffer);
 }
 
+void VulkanApp::createIndexBuffer() {
+    VkDeviceSize bufferSize = sizeof(mIndices[0]) * mIndices.size();
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    void* data;
+    vkMapMemory(mDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, mIndices.data(), (size_t)bufferSize);
+    vkUnmapMemory(mDevice, stagingBufferMemory);
+
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mIndexBuffer, mIndexBufferMemory);
+    copyBuffer(stagingBuffer, mIndexBuffer, bufferSize);
+
+    vkDestroyBuffer(mDevice, stagingBuffer, nullptr);
+    vkFreeMemory(mDevice, stagingBufferMemory, nullptr);
+}
+
 void VulkanApp::createCommandBuffers() {
     mCommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
     VkCommandBufferAllocateInfo allocInfo { VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO };
@@ -783,7 +802,10 @@ void VulkanApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imag
     VkDeviceSize offsets[] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdDraw(commandBuffer, static_cast<uint32_t>(mVertices.size()), 1, 0, 0);
+    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+    //vkCmdDraw(commandBuffer, static_cast<uint32_t>(mVertices.size()), 1, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mIndices.size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
 
@@ -795,6 +817,8 @@ void VulkanApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imag
 void VulkanApp::cleanup() {
     vkDeviceWaitIdle(mDevice);
     cleanupSwapChain();
+    vkDestroyBuffer(mDevice, mIndexBuffer, nullptr);
+    vkFreeMemory(mDevice, mIndexBufferMemory, nullptr);
     vkDestroyBuffer(mDevice, mVertexBuffer, nullptr);
     vkFreeMemory(mDevice, mVertexBufferMemory, nullptr);
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {

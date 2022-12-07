@@ -109,12 +109,17 @@ private:
     };
 
     const std::vector<Vertex> mVertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
-    
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+
+    const std::vector<uint16_t> mIndices = { 0, 1, 2, 2, 3, 0 };
+
     VkBuffer mVertexBuffer;
     VkDeviceMemory mVertexBufferMemory;
+    VkBuffer mIndexBuffer;
+    VkDeviceMemory mIndexBufferMemory;
 
     void initVulkan();
 
@@ -157,6 +162,8 @@ private:
     void createCommandPool();
 
     void createVertexBuffer();
+
+    void createIndexBuffer();
 
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
