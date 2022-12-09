@@ -5,6 +5,7 @@
 #include <optional>
 #include <vector>
 #include <cstdint>    // Necessary for uint32_t
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <array>
 
@@ -50,6 +51,7 @@ private:
     std::vector<VkImageView> mSwapChainImageViews;
 
     VkRenderPass mRenderPass;
+    VkDescriptorSetLayout mDescriptorSetLayout;
     VkPipelineLayout mPipelineLayout;
     VkPipeline mGraphicsPipeline;
 
@@ -121,6 +123,19 @@ private:
     VkBuffer mIndexBuffer;
     VkDeviceMemory mIndexBufferMemory;
 
+    struct UniformBufferObject {
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 proj;
+    };
+
+    std::vector<VkBuffer> mUniformBuffers;
+    std::vector<VkDeviceMemory> mUniformBuffersMemory;
+    std::vector<void*> mUniformBuffersMapped;
+
+    VkDescriptorPool mDescriptorPool;
+    std::vector<VkDescriptorSet> mDescriptorSets;
+
     void initVulkan();
 
     void createInstance();
@@ -153,6 +168,8 @@ private:
 
     void createRenderPass();
 
+    void createDescriptorSetLayout();
+
     void createGraphicsPipeline();
 
     VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -163,13 +180,19 @@ private:
 
     void createVertexBuffer();
 
-    void createIndexBuffer();
-
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
+    void createIndexBuffer();
+
+    void createUniformBuffers();
+
+    void createDescriptorPool();
+
+    void createDescriptorSets();
 
     void createCommandBuffers();
 
@@ -178,6 +201,8 @@ private:
     void recreateSwapChain();
 
     void cleanupSwapChain();
+
+    void updateUniformBuffer(uint32_t currentImage);
 
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
