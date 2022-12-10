@@ -54,6 +54,7 @@ find_package(game-activity REQUIRED CONFIG)
 # build script, prebuilt third-party libraries, or system libraries.
 
 add_subdirectory ("../../../../../Dependency/glm" "glm")
+add_subdirectory ("../../../../../Dependency/stb_image" "stb_image")
 
 target_link_libraries( # Specifies the target library.
         vulkanapp
@@ -77,4 +78,5 @@ target_link_libraries( # Specifies the target library.
         ${log-lib}
 
         vulkan
-        glm)
+        glm
+        stb_image)

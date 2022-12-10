@@ -7,6 +7,7 @@ project ("VulkanDemo" VERSION 0.1)
 
 add_subdirectory ("Dependency/glfw" "glfw")
 add_subdirectory ("Dependency/glm" "glm")
+add_subdirectory ("Dependency/stb_image" "stb_image")
 
 add_subdirectory ("Source")
 
