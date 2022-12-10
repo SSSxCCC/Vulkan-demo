@@ -8,10 +8,10 @@ void Platform::createSurface(VkInstance& instance, VkSurfaceKHR& surface) {
         throw std::runtime_error("failed to create window surface!");
     }
 #elif defined(__ANDROID__)
-    VkAndroidSurfaceCreateInfoKHR createInfo{VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR};
+    VkAndroidSurfaceCreateInfoKHR createInfo { VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR };
     createInfo.window = mApp->window;
     if (vkCreateAndroidSurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create window surface!");
+        throw std::runtime_error("failed to create android surface!");
     }
 #endif
 }
