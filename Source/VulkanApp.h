@@ -36,7 +36,6 @@ private:
 
     VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
     VkDevice mDevice;
-    VkPhysicalDeviceFeatures mDeviceFeatures{};
     VkQueue mGraphicsQueue;
     VkQueue mPresentQueue;
 
@@ -138,6 +137,8 @@ private:
 
     VkImage mTextureImage;
     VkDeviceMemory mTextureImageMemory;
+    VkImageView mTextureImageView;
+    VkSampler mTextureSampler;
 
     void initVulkan();
 
@@ -169,6 +170,8 @@ private:
 
     void createImageViews();
 
+    VkImageView createImageView(VkImage image, VkFormat format);
+
     void createRenderPass();
 
     void createDescriptorSetLayout();
@@ -188,6 +191,10 @@ private:
     void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+    void createTextureImageView();
+
+    void createTextureSampler();
 
     void createVertexBuffer();
 
