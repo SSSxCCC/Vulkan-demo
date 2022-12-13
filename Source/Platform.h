@@ -44,11 +44,11 @@ private:
 class Platform {
 public:
 #if defined(WINDOWS)
- Platform(GLFWwindow* window) : mWindow(window){};
- std::ostream& mOut = std::cout;
+    Platform(GLFWwindow* window) : mWindow(window){};
+    std::ostream& mOut = std::cout;
 #elif defined(ANDROID)
- Platform(android_app* app) : mApp(app), mAndroidOut("AO"), mOut(&mAndroidOut){};
- std::ostream mOut;
+    Platform(android_app* app) : mApp(app), mAndroidOut("AO"), mOut(&mAndroidOut){};
+    std::ostream mOut;
 #endif
     void createSurface(VkInstance& instance, VkSurfaceKHR& surface);
     void getSurfaceSize(int& width, int& height);
@@ -58,10 +58,10 @@ public:
     VkCompositeAlphaFlagBitsKHR getCompositeAlpha();
 private:
 #if defined(WINDOWS)
- GLFWwindow* mWindow;
+    GLFWwindow* mWindow;
 #elif defined(ANDROID)
- android_app* mApp;
- AndroidOut mAndroidOut;
+    android_app* mApp;
+    AndroidOut mAndroidOut;
 #endif
 };
 
