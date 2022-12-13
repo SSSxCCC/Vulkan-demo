@@ -3,11 +3,11 @@
 #include <iostream>
 
 void Platform::createSurface(VkInstance& instance, VkSurfaceKHR& surface) {
-#if defined(_WIN32)
+#if defined(WINDOWS)
     if (glfwCreateWindowSurface(instance, mWindow, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface!");
     }
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
     VkAndroidSurfaceCreateInfoKHR createInfo { VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR };
     createInfo.window = mApp->window;
     if (vkCreateAndroidSurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
@@ -17,28 +17,28 @@ void Platform::createSurface(VkInstance& instance, VkSurfaceKHR& surface) {
 }
 
 void Platform::getSurfaceSize(int& width, int& height) {
-#if defined(_WIN32)
+#if defined(WINDOWS)
     glfwGetFramebufferSize(mWindow, &width, &height);
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
     width = ANativeWindow_getWidth(mApp->window);
     height = ANativeWindow_getHeight(mApp->window);
 #endif
 }
 
 void Platform::waitSurfaceSize() {
-#if defined(_WIN32)
+#if defined(WINDOWS)
     int width = 0, height = 0;
     getSurfaceSize(width, height);
     while (width == 0 || height == 0) {
         getSurfaceSize(width, height);
         glfwWaitEvents();
     }
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
 #endif
 }
 
 std::vector<char> Platform::readFile(const std::string& filename) {
-#if defined(_WIN32)
+#if defined(WINDOWS)
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
     if (!file.is_open()) {
@@ -52,7 +52,7 @@ std::vector<char> Platform::readFile(const std::string& filename) {
     file.close();
 
     return buffer;
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
     AAsset* file = AAssetManager_open(mApp->activity->assetManager, filename.c_str(), AASSET_MODE_BUFFER);
 
     if (!file) {
@@ -69,7 +69,7 @@ std::vector<char> Platform::readFile(const std::string& filename) {
 }
 
 std::vector<const char*> Platform::getExtensions() {
-#if defined(_WIN32)
+#if defined(WINDOWS)
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -78,7 +78,7 @@ std::vector<const char*> Platform::getExtensions() {
         extensions.push_back(glfwExtensions[i]);
     }
     return extensions;
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
     std::vector<const char*> extensions;
     extensions.push_back("VK_KHR_surface");
     extensions.push_back("VK_KHR_android_surface");
@@ -87,9 +87,9 @@ std::vector<const char*> Platform::getExtensions() {
 }
 
 VkCompositeAlphaFlagBitsKHR Platform::getCompositeAlpha() {
-#if defined(_WIN32)
+#if defined(WINDOWS)
     return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
     return VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
 #endif
 }

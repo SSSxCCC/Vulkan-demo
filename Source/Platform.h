@@ -1,12 +1,18 @@
 #ifndef _Platform_H_
 #define _Platform_H_
 
+#if defined(_WIN32)
+#define WINDOWS
+#elif defined(__ANDROID__)
+#define ANDROID
+#endif
+
 #include <sstream>
 
-#if defined(_WIN32)
+#if defined(WINDOWS)
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#elif defined(__ANDROID__)
+#elif defined(ANDROID)
 #define VK_USE_PLATFORM_ANDROID_KHR
 #include <android/log.h>
 #include <game-activity/native_app_glue/android_native_app_glue.h>
@@ -41,12 +47,12 @@ class AndroidOut : public std::stringbuf {
 
 class Platform {
 public:
-#if defined(_WIN32)
-    Platform(GLFWwindow* window) : mWindow(window) { };
-    std::ostream& mOut = std::cout;
-#elif defined(__ANDROID__)
-    Platform(android_app* app) : mApp(app), mAndroidOut("AO"), mOut(&mAndroidOut) { };
-    std::ostream mOut;
+#if defined(WINDOWS)
+ Platform(GLFWwindow* window) : mWindow(window){};
+ std::ostream& mOut = std::cout;
+#elif defined(ANDROID)
+ Platform(android_app* app) : mApp(app), mAndroidOut("AO"), mOut(&mAndroidOut){};
+ std::ostream mOut;
 #endif
     void createSurface(VkInstance& instance, VkSurfaceKHR& surface);
     void getSurfaceSize(int& width, int& height);
@@ -55,11 +61,11 @@ public:
     std::vector<const char*> getExtensions();
     VkCompositeAlphaFlagBitsKHR getCompositeAlpha();
 private:
-#if defined(_WIN32)
-    GLFWwindow* mWindow;
-#elif defined(__ANDROID__)
-    android_app* mApp;
-    AndroidOut mAndroidOut;
+#if defined(WINDOWS)
+ GLFWwindow* mWindow;
+#elif defined(ANDROID)
+ android_app* mApp;
+ AndroidOut mAndroidOut;
 #endif
 };
 
