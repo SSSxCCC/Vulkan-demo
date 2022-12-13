@@ -16,27 +16,23 @@
 #define VK_USE_PLATFORM_ANDROID_KHR
 #include <android/log.h>
 #include <game-activity/native_app_glue/android_native_app_glue.h>
-
 /*!
- * Use this class to create an output stream that writes to logcat. By default, a global one is
- * defined as @a aout
+ * Use this class to create an output stream that writes to logcat.
  */
 class AndroidOut : public std::stringbuf {
-   public:
+public:
     /*!
      * Creates a new output stream for logcat
      * @param kLogTag the log tag to output
      */
     inline AndroidOut(const char* kLogTag) : logTag_(kLogTag) {}
-
-   protected:
+protected:
     virtual int sync() override {
         __android_log_print(ANDROID_LOG_DEBUG, logTag_, "%s", str().c_str());
         str("");
         return 0;
     }
-
-   private:
+private:
     const char* logTag_;
 };
 #endif
