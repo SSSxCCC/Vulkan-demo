@@ -13,8 +13,8 @@ int main() {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-        
-        VulkanApp* vulkanApp = new VulkanApp(new Platform(window));
+
+        VulkanApp* vulkanApp = new VulkanApp(std::make_shared<Platform>(window));
         glfwSetWindowUserPointer(window, vulkanApp);
 
         while (!glfwWindowShouldClose(window)) {

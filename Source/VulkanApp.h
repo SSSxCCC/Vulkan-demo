@@ -2,6 +2,7 @@
 #define _VulkanApp_H_
 
 #include "Platform.h"
+#include <memory>
 #include <optional>
 #include <vector>
 #include <cstdint>    // Necessary for uint32_t
@@ -11,8 +12,8 @@
 
 class VulkanApp {
 public:
-    VulkanApp(Platform* platform) : mPlatform(platform) { initVulkan(); }
-    ~VulkanApp() { cleanup(); delete mPlatform; }
+    VulkanApp(std::shared_ptr<Platform> platform) : mPlatform(platform) { initVulkan(); }
+    ~VulkanApp() { cleanup(); }
 
     void drawFrame();
 
@@ -21,7 +22,7 @@ public:
     }
 
 private:
-    Platform* mPlatform;
+    std::shared_ptr<Platform> mPlatform;
 
     VkInstance mInstance;
 
