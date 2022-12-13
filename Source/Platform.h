@@ -53,6 +53,7 @@ public:
     void waitSurfaceSize();
     std::vector<char> readFile(const std::string& filename);
     std::vector<const char*> getExtensions();
+    VkCompositeAlphaFlagBitsKHR getCompositeAlpha();
 private:
 #if defined(_WIN32)
     GLFWwindow* mWindow;

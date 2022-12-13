@@ -85,3 +85,11 @@ std::vector<const char*> Platform::getExtensions() {
     return extensions;
 #endif
 }
+
+VkCompositeAlphaFlagBitsKHR Platform::getCompositeAlpha() {
+#if defined(_WIN32)
+    return VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+#elif defined(__ANDROID__)
+    return VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+#endif
+}
