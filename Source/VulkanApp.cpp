@@ -7,6 +7,9 @@
 #include <chrono>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+#include <unordered_map>
 
 void VulkanApp::drawFrame() {
     vkWaitForFences(mDevice, 1, &mInFlightFences[mCurrentFrame], VK_TRUE, UINT64_MAX);
@@ -78,6 +81,7 @@ void VulkanApp::initVulkan() {
     createTextureImage();
     createTextureImageView();
     createTextureSampler();
+    loadModel();
     createVertexBuffer();
     createIndexBuffer();
     createUniformBuffers();
@@ -715,7 +719,7 @@ bool VulkanApp::hasStencilComponent(VkFormat format) {
 
 void VulkanApp::createTextureImage() {
     int texWidth, texHeight, texChannels;
-    auto texture = mPlatform->readFile("Texture/texture.jpg");
+    auto texture = mPlatform->readFile("Texture/viking_room.png");
     stbi_uc* pixels = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(texture.data()), texture.size(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
     VkDeviceSize imageSize = texWidth * texHeight * 4;
     if (!pixels) {
@@ -873,6 +877,52 @@ void VulkanApp::createTextureSampler() {
     samplerInfo.maxLod = 0.0f;
     if (vkCreateSampler(mDevice, &samplerInfo, nullptr, &mTextureSampler) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture sampler!");
+    }
+}
+
+struct membuf : std::streambuf {
+    membuf(char* begin, char* end) {
+        this->setg(begin, begin, end);
+    }
+};
+
+void VulkanApp::loadModel() {
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string warn, err;
+
+    auto obj = mPlatform->readFile("Model/viking_room.obj");
+    membuf objbuf(obj.data(), obj.data() + sizeof(char) * obj.size());
+    std::istream in(&objbuf);
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, &in)) {
+        throw std::runtime_error(warn + err);
+    }
+
+    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+    for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            Vertex vertex{};
+
+            vertex.pos = {
+                attrib.vertices[3 * index.vertex_index + 0],
+                attrib.vertices[3 * index.vertex_index + 1],
+                attrib.vertices[3 * index.vertex_index + 2]
+            };
+
+            vertex.texCoord = {
+                attrib.texcoords[2 * index.texcoord_index + 0],
+                1.0f - attrib.texcoords[2 * index.texcoord_index + 1]  // The OBJ format assumes a coordinate system where a vertical coordinate of 0 means the bottom of the image, however we've uploaded our image into Vulkan in a top to bottom orientation where 0 means the top of the image. Solve this by flipping the vertical component of the texture coordinates.
+            };
+
+            vertex.color = {1.0f, 1.0f, 1.0f};
+
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] = static_cast<uint32_t>(mVertices.size());
+                mVertices.push_back(vertex);
+            }
+            mIndices.push_back(uniqueVertices[vertex]);
+        }
     }
 }
 
@@ -1170,7 +1220,7 @@ void VulkanApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imag
     VkBuffer vertexBuffers[] = { mVertexBuffer };
     VkDeviceSize offsets[] = { 0 };
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0, 1, &mDescriptorSets[mCurrentFrame], 0, nullptr);
     
     //vkCmdDraw(commandBuffer, static_cast<uint32_t>(mVertices.size()), 1, 0, 0);

@@ -55,6 +55,7 @@ find_package(game-activity REQUIRED CONFIG)
 
 add_subdirectory ("../../../../../Dependency/glm" "glm")
 add_subdirectory ("../../../../../Dependency/stb_image" "stb_image")
+add_subdirectory ("../../../../../Dependency/tinyobjloader" "tinyobjloader")
 
 target_link_libraries( # Specifies the target library.
         vulkanapp
@@ -79,4 +80,5 @@ target_link_libraries( # Specifies the target library.
 
         vulkan
         glm
-        stb_image)
+        stb_image
+        tinyobjloader)
