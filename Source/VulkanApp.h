@@ -181,6 +181,11 @@ private:
     VkDeviceMemory mDepthImageMemory;
     VkImageView mDepthImageView;
 
+    VkSampleCountFlagBits mMsaaSamples = VK_SAMPLE_COUNT_1_BIT;
+    VkImage mColorImage;
+    VkDeviceMemory mColorImageMemory;
+    VkImageView mColorImageView;
+
     void initVulkan();
 
     void createInstance();
@@ -198,6 +203,8 @@ private:
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+    VkSampleCountFlagBits getMaxUsableSampleCount();
 
     void createLogicalDevice();
 
@@ -225,6 +232,8 @@ private:
 
     void createCommandPool();
 
+    void createColorResources();
+
     void createDepthResources();
 
     VkFormat findDepthFormat();
@@ -235,7 +244,7 @@ private:
 
     void createTextureImage();
 
-    void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+    void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
     void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
 
