@@ -14,7 +14,7 @@
 
 3 安装[Vulkan SDK](https://vulkan.lunarg.com/)
 
-4 安装[CMake](https://cmake.org/download/)
+4 安装[CMake](https://cmake.org/download/)，并安装C/C++和Cmake Tools插件
 
 5 下载本项目代码，使用VSCode打开本项目根目录
 
@@ -28,4 +28,4 @@
 
 2 在Android Studio中将"Android"目录作为项目打开
 
-3 插入调试手机，点击Android Studio上方的运行按钮
+3 插入调试手机，点击Android Studio上方的运行按钮即可编译运行
