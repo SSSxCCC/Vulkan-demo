@@ -1,6 +1,8 @@
 # Vulkan demo
 
-本项目是我跟随[教程](https://vulkan-tutorial.com/Introduction)学习Vulkan时创建的测试项目
+本项目是我跟随[教程](https://vulkan-tutorial.com/Introduction)学习Vulkan时创建的测试项目。
+
+本项目可以同时运行在Windows和Android系统。
 
 ## 代码运行方法
 
